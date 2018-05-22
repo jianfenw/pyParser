@@ -1,0 +1,13 @@
+BasicColorTime:
+  Order: 1
+  Pattern: |
+    <Color> \s? at \s? <Time>
+  # Angle brackets detonate expression groups
+  # Multiple expressions in one group are combined together
+
+
+BasicFoodOrder:
+  Order: 2
+  Pattern: |
+    <Time> - <Color>
+  # Angle brackets detonate expression groups

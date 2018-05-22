@@ -1,0 +1,16 @@
+Color:
+    Basic Color:
+        Expression: (Red|Orange|Yellow|Green|Blue|Violet|Brown|Black)
+        Matches: Orange | Green
+        Non-Matches: White
+        Groups:
+          - Color
+
+Time:
+    Basic Time:
+        Expression: ([0-9]|[1][0-2]) \s? (am|pm)
+        Matches: 8am | 3 pm
+        Non-Matches: 8a | 8:00 am | 13pm
+        Groups:
+          - Hour
+          - AMPM
