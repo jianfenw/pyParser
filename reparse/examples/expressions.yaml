@@ -1,0 +1,8 @@
+TrafficType:
+  Basic Color:
+    Expression: ()
+    Matches: 
+    Non-Matches:
+    Groups:
+      - TrafficType
+

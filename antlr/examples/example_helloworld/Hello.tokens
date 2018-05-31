@@ -1,0 +1,9 @@
+T__0=1
+T__1=2
+T__2=3
+WORD=4
+WHITESPACE=5
+NEWLINE=6
+':'=1
+'hello'=2
+'/'=3

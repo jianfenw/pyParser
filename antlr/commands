@@ -1,0 +1,9 @@
+
+antlr4 -visitor <Grammar-file>
+
+grun <grammar-name> <rule-to-test> <input-filename(s)>
+
+antlr4 -Dlanguage=Python2 Chat.g4
+
+pip install antlr4-python2-runtime
+
