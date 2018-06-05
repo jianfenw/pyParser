@@ -11,6 +11,7 @@ class UDNFCPUserListener(NFCPUserListener):
 		self.nickname_sp_mapping = {}
 		self.tt_sp_mapping = []
 
+		self.overall_nf_chain_list = []
 		self.service_path_count = 0
 		self.line_count = 0
 
@@ -48,6 +49,7 @@ class UDNFCPUserListener(NFCPUserListener):
 		nf_chain_list = self.get_nf_chain_list(nf_chain_obj)
 		#print(nickname_tt, nf_chain_list)
 		self.nickname_sp_mapping[nickname_tt] = (self.service_path_count, nf_chain_list)
+		self.overall_nf_chain_list.append(nf_chain_list)
 		pass
 
 	# Exit a parse tree produced by NFCPUserParser#nick_service_path.
@@ -69,6 +71,7 @@ class UDNFCPUserListener(NFCPUserListener):
 		nf_chain_list = self.get_nf_chain_list(nf_chain_obj)
 		#print(traffic_type_list, nf_chain_list)
 		self.tt_sp_mapping.append((traffic_type_list, (self.service_path_count, nf_chain_list)))
+		self.overall_nf_chain_list.append(nf_chain_list)
 		pass
 
 	# Exit a parse tree produced by NFCPUserParser#tt_service_path.
