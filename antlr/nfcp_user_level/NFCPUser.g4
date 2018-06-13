@@ -1,3 +1,15 @@
+/*
+ * NFCPUser.g4
+ *
+ * This is the ANTLR grammar file for the NFCP user-level configuration language.
+ * We aim to provide the following syntax.
+ * - define NF instances
+ * - define flow spec
+ * - associate several flow spec(s) with a NF instance
+ * - define arguments
+ *
+ */
+
 grammar NFCPUser ;
 
 
@@ -5,35 +17,105 @@ grammar NFCPUser ;
  * Parser Rules
  */
 
-total : (line)+ EOF;
-line : (nickname_tt | nickname_nf | nick_service_path | tt_service_path)? NEWLINE;
+total : ( line+ ) EOF ;
 
-nick_service_path : WORD ':' nf_chain ;
-tt_service_path : traffic_type ':' nf_chain ;
+line : ( define_int | define_float | define_string | define_bool
+	| define_nlist | define_ntuple | define_nlinkedlist
+	| define_nfinstance | define_flowspec | define_nfchain | configue_nfchain )? NEWLINE ;
 
-nickname_tt : (WORD) '::' traffic_type ;
-traffic_type : '{' (basic_traffic_type)+ '}' ;
-basic_traffic_type : '(' WORD ',' WORD ',' WORD ')' ;
+define_int : VARIABLENAME '=' INT ;
 
-nickname_nf : (WORD) '::' nf ;
-nf_chain : ( nf ('->' nf)* ) ;
-nf : (WORD | BESSNF);
+define_float : VARIABLENAME '=' FLOAT ;
 
+define_string : VARIABLENAME '=' STRING ;
+
+define_bool : VARIABLENAME '=' BOOL ;
+
+define_nlist : VARIABLENAME '=' nlist ;
+
+define_ntuple : VARIABLENAME '=' ntuple ;
+
+define_nlinkedlist : VARIABLENAME '=' nlinkedlist ;
+
+define_nfinstance : VARIABLENAME '=' netfunction ;
+
+
+/*
+ * Define Flowspec and NF Chain. Configure NF Chain
+ * Note: 
+ * - type(flowspec) must be nlist whose elements must be tuple
+ * - type(netfunction_chain) must be nlinkedlist whose elements must be netfunction
+ */
+
+define_flowspec : VARIABLENAME '=' flowspec ;
+
+define_nfchain : VARIABLENAME '=' netfunction_chain ;
+
+configue_nfchain : VARIABLENAME ':' VARIABLENAME ;
+
+
+/*
+ * Network Functions
+ */
+
+flowspec : nlist ;
+
+netfunction_chain : nlinkedlist ;
+
+
+/*
+ * Structured Data Types
+ */
+
+netfunction : ( VARIABLENAME '(' ')' ) ;
+
+nlist : '[' ( (nlist_elem)? | (nlist_elem (',' nlist_elem)+) ) ']' ;
+
+nlist_elem : ( ntuple | INT | FLOAT | STRING | VARIABLENAME ) ;
+
+ntuple : '{' ( ntuple_elem (',' ntuple_elem)* ) '}' ;
+
+ntuple_elem : (STRING) ':' (STRING | INT | FLOAT) ;
+
+nlinkedlist : ( nlinkedlist_elem ( '->' nlinkedlist_elem )* ) ;
+
+nlinkedlist_elem : ( netfunction | VARIABLENAME ) ;
 
 
 /*
  * Lexer Rules
  */
 
-fragment LOWERCASE : [a-z];
-fragment UPPERCASE : [A-Z];
-fragment NUMBER : [0-9];
-
 MULTILINECOMMENT : '/*' .*? '*/' -> skip ;
 SINGLELINECOMMENT : '//' ~[\r\n]* -> skip ;
-
-WORD : (LOWERCASE | UPPERCASE | NUMBER | '_' | '.' )+ ;
-BESSNF: WORD '()' ;
-
 WHITESPACE : ( ' ' | '\t' )+ -> skip ; 
 NEWLINE : ('\r'? '\n' | '\r')+ ;
+
+fragment LOWERCASE : [a-z];
+fragment UPPERCASE : [A-Z];
+fragment DIGIT : [0-9];
+
+
+/*
+ * Numbers
+ */
+INT : (DIGIT)+ ;
+FLOAT : (DIGIT)+ '.' (DIGIT)*
+	| '.' (DIGIT)+ ;
+
+
+/*
+ * String
+ */
+STRING : ( '\'' WILDCARD '\'' | '"' .*? '"' ) ;
+fragment WILDCARD : .*? ;
+
+/*
+ * Bool
+ */
+BOOL : ( 'False' | 'True' ) ;
+
+
+/* Variable Name */
+VARIABLENAME : (LOWERCASE | UPPERCASE | DIGIT | '_' )+ ;
+

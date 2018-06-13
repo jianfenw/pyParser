@@ -24,6 +24,7 @@ import sys
 import os
 import subprocess
 import collections
+import copy
 from util.nfcp_nf_node import *
 from util.lang_parser_helper import *
 from antlr4 import *
@@ -58,8 +59,13 @@ def nf_chain_get_nf_node_list(scanner):
 	nsh_encap_required = True
 	for nf_chain in scanner.overall_nf_chain_list:
 		for nf in nf_chain:
-			tmp_nf_node = nf_node(nf, curr_sp, curr_idx)
-			#print tmp_nf_node.nf_type
+			nf_name = copy.deepcopy(nf)
+			tmp_nf_node = nf_node(nf_name, curr_sp, curr_idx)
+			if tmp_nf_node.nf_type == 0: # nf_type == 0 (unknown NF name - must be a nickname)
+				nf_name = scanner.nickname_nf_mapping[nf_name]
+				nf_name = nfcp_get_bess_module_name(nf_name)
+				tmp_nf_node = nf_node(nf_name, curr_sp, curr_idx)
+
 			if tmp_nf_node.nf_type == 1: # P4 node
 				p4_list.append(tmp_nf_node)
 				nsh_encap_required = True
@@ -69,8 +75,10 @@ def nf_chain_get_nf_node_list(scanner):
 					nsh_encap_node = nf_node('NSHEncap', curr_sp, curr_idx)
 					p4_list.append(nsh_encap_node)
 					nsh_encap_required = False
+			
 			curr_idx += 1
 		curr_sp += 1
+		curr_idx = 1
 	#print "# of P4 nodes:", len(p4_list)
 	#print "# of BESS nodes:", len(bess_list)
 	return p4_list, bess_list
@@ -100,47 +108,40 @@ def nf_chain_parser_main(config_filename):
 	print("Parser: OK")
 
 	tree = parser.total()
-	scaner = UDNFCPUserListener()
+	scanner = UDNFCPUserListener()
 	walker = ParseTreeWalker()
-	walker.walk(scaner, tree)
+	walker.walk(scanner, tree)
 	print("Walker: OK")
 
-	print "# 1 Nickname - NF mapping:", scaner.nickname_nf_mapping
-	print "# 2 Nickname - TT mapping:", scaner.nickname_tt_mapping
-	print "# 3 Nickname - SP mapping:", scaner.nickname_sp_mapping
-	print '# 4 TT - SP mapping:', scaner.tt_sp_mapping
-	print 'Total # of SP:', scaner.service_path_count
-	print scaner.overall_nf_chain_list
+	print "# 1 Nickname - NF mapping:", scanner.nickname_nf_mapping
+	print "# 2 Nickname - TT mapping:", scanner.nickname_tt_mapping
+	print "# 3 Nickname - SP mapping:", scanner.nickname_sp_mapping
+	print '# 4 TT - SP mapping:', scanner.tt_sp_mapping
+	print 'Total # of SP:', scanner.service_path_count
+	print scanner.overall_nf_chain_list
 	print("NFCP User-Level Parser Finished!")
 
-	p4_list, bess_list = nf_chain_get_nf_node_list(scaner)
-
+	p4_list, bess_list = nf_chain_get_nf_node_list(scanner)
 	return p4_list, bess_list
-
-
-
-def nf_chain_parser_get_nickname_nf_mapping():
-	nickname_nf_mapping = {}
-
-	return
 
 
 def nf_chain_parser_tester(argv):
 	print "NF Chain Parser begins:"
 	
 	print "List all user-level configuration scripts:"
-	#subprocess.call(['ls', './user_level_examples'])
+	subprocess.call(['ls', './user_level_examples'])
 	# return # for test subprocess
 
-	#config_filename = raw_input("Please input the NF chain configuration filename:\n")
-	config_filename = 'example.conf'
-	p4_list, bess_list = nf_chain_parser_main(config_filename)
+	config_filename = raw_input("Please input the NF chain configuration filename:\n")
+	#config_filename = 'example.conf'
+	p4_list, bess_list = nf_chain_parser_main('./user_level_examples/'+config_filename)
 
 	# Test whether the service_path_id and service_id are correctly set up
 	print("# of P4 modules: %d, # of BESS modules: %d" %( len(p4_list), len(bess_list) ))
+	for p4_node in p4_list:
+		print "%s: sp=%d, sidx=%d" %(p4_node.name, p4_node.service_path_id, p4_node.service_id)
 
 	return
-
 
 
 if __name__ == '__main__':

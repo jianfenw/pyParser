@@ -39,97 +39,241 @@ public class NFCPUserBaseListener implements NFCPUserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNick_service_path(NFCPUserParser.Nick_service_pathContext ctx) { }
+	@Override public void enterDefine_int(NFCPUserParser.Define_intContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNick_service_path(NFCPUserParser.Nick_service_pathContext ctx) { }
+	@Override public void exitDefine_int(NFCPUserParser.Define_intContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterTt_service_path(NFCPUserParser.Tt_service_pathContext ctx) { }
+	@Override public void enterDefine_float(NFCPUserParser.Define_floatContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitTt_service_path(NFCPUserParser.Tt_service_pathContext ctx) { }
+	@Override public void exitDefine_float(NFCPUserParser.Define_floatContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNickname_tt(NFCPUserParser.Nickname_ttContext ctx) { }
+	@Override public void enterDefine_string(NFCPUserParser.Define_stringContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNickname_tt(NFCPUserParser.Nickname_ttContext ctx) { }
+	@Override public void exitDefine_string(NFCPUserParser.Define_stringContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterTraffic_type(NFCPUserParser.Traffic_typeContext ctx) { }
+	@Override public void enterDefine_bool(NFCPUserParser.Define_boolContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitTraffic_type(NFCPUserParser.Traffic_typeContext ctx) { }
+	@Override public void exitDefine_bool(NFCPUserParser.Define_boolContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterBasic_traffic_type(NFCPUserParser.Basic_traffic_typeContext ctx) { }
+	@Override public void enterDefine_nlist(NFCPUserParser.Define_nlistContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitBasic_traffic_type(NFCPUserParser.Basic_traffic_typeContext ctx) { }
+	@Override public void exitDefine_nlist(NFCPUserParser.Define_nlistContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNickname_nf(NFCPUserParser.Nickname_nfContext ctx) { }
+	@Override public void enterDefine_ntuple(NFCPUserParser.Define_ntupleContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNickname_nf(NFCPUserParser.Nickname_nfContext ctx) { }
+	@Override public void exitDefine_ntuple(NFCPUserParser.Define_ntupleContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNf_chain(NFCPUserParser.Nf_chainContext ctx) { }
+	@Override public void enterDefine_nlinkedlist(NFCPUserParser.Define_nlinkedlistContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNf_chain(NFCPUserParser.Nf_chainContext ctx) { }
+	@Override public void exitDefine_nlinkedlist(NFCPUserParser.Define_nlinkedlistContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNf(NFCPUserParser.NfContext ctx) { }
+	@Override public void enterDefine_nfinstance(NFCPUserParser.Define_nfinstanceContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNf(NFCPUserParser.NfContext ctx) { }
+	@Override public void exitDefine_nfinstance(NFCPUserParser.Define_nfinstanceContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterDefine_flowspec(NFCPUserParser.Define_flowspecContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDefine_flowspec(NFCPUserParser.Define_flowspecContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterDefine_nfchain(NFCPUserParser.Define_nfchainContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDefine_nfchain(NFCPUserParser.Define_nfchainContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterConfigue_nfchain(NFCPUserParser.Configue_nfchainContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitConfigue_nfchain(NFCPUserParser.Configue_nfchainContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterFlowspec(NFCPUserParser.FlowspecContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitFlowspec(NFCPUserParser.FlowspecContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNetfunction_chain(NFCPUserParser.Netfunction_chainContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNetfunction_chain(NFCPUserParser.Netfunction_chainContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNetfunction(NFCPUserParser.NetfunctionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNetfunction(NFCPUserParser.NetfunctionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNlist(NFCPUserParser.NlistContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNlist(NFCPUserParser.NlistContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNlist_elem(NFCPUserParser.Nlist_elemContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNlist_elem(NFCPUserParser.Nlist_elemContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNtuple(NFCPUserParser.NtupleContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNtuple(NFCPUserParser.NtupleContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNtuple_elem(NFCPUserParser.Ntuple_elemContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNtuple_elem(NFCPUserParser.Ntuple_elemContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNlinkedlist(NFCPUserParser.NlinkedlistContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNlinkedlist(NFCPUserParser.NlinkedlistContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNlinkedlist_elem(NFCPUserParser.Nlinkedlist_elemContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNlinkedlist_elem(NFCPUserParser.Nlinkedlist_elemContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

@@ -12,6 +12,7 @@
 """
 
 import copy
+import re
 
 global bess_module_list
 global p4_module_list
@@ -57,6 +58,16 @@ def nfcp_nf_chain_length(p4_list):
     return nf_chain_length
 
 
+def nfcp_get_bess_module_name(module_name):
+    """
+    Typically, bess modules come with a pair of '\(\)'. Here, we return the name of the NF
+    without any attribute.
+    """
+    res = re.match(r"(.*)\((.*)\)", module_name, re.M|re.I)
+    bess_name = res.group(1)
+    return bess_name
+
+
 """
     nfcp_module_type(...):
     This function will return:
@@ -82,7 +93,7 @@ def nfcp_module_type(module_name):
 """
 class nf_node(object):
 
-    def __init__(self, nf_name="", service_path_id = -1, seq_index = -1):
+    def __init__(self, nf_name=None, service_path_id = -1, seq_index = -1):
         self.name = nf_name
         self.service_path_id = service_path_id
         self.service_id = seq_index

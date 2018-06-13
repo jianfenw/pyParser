@@ -27,83 +27,203 @@ public interface NFCPUserListener extends ParseTreeListener {
 	 */
 	void exitLine(NFCPUserParser.LineContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link NFCPUserParser#nick_service_path}.
+	 * Enter a parse tree produced by {@link NFCPUserParser#define_int}.
 	 * @param ctx the parse tree
 	 */
-	void enterNick_service_path(NFCPUserParser.Nick_service_pathContext ctx);
+	void enterDefine_int(NFCPUserParser.Define_intContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link NFCPUserParser#nick_service_path}.
+	 * Exit a parse tree produced by {@link NFCPUserParser#define_int}.
 	 * @param ctx the parse tree
 	 */
-	void exitNick_service_path(NFCPUserParser.Nick_service_pathContext ctx);
+	void exitDefine_int(NFCPUserParser.Define_intContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link NFCPUserParser#tt_service_path}.
+	 * Enter a parse tree produced by {@link NFCPUserParser#define_float}.
 	 * @param ctx the parse tree
 	 */
-	void enterTt_service_path(NFCPUserParser.Tt_service_pathContext ctx);
+	void enterDefine_float(NFCPUserParser.Define_floatContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link NFCPUserParser#tt_service_path}.
+	 * Exit a parse tree produced by {@link NFCPUserParser#define_float}.
 	 * @param ctx the parse tree
 	 */
-	void exitTt_service_path(NFCPUserParser.Tt_service_pathContext ctx);
+	void exitDefine_float(NFCPUserParser.Define_floatContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link NFCPUserParser#nickname_tt}.
+	 * Enter a parse tree produced by {@link NFCPUserParser#define_string}.
 	 * @param ctx the parse tree
 	 */
-	void enterNickname_tt(NFCPUserParser.Nickname_ttContext ctx);
+	void enterDefine_string(NFCPUserParser.Define_stringContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link NFCPUserParser#nickname_tt}.
+	 * Exit a parse tree produced by {@link NFCPUserParser#define_string}.
 	 * @param ctx the parse tree
 	 */
-	void exitNickname_tt(NFCPUserParser.Nickname_ttContext ctx);
+	void exitDefine_string(NFCPUserParser.Define_stringContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link NFCPUserParser#traffic_type}.
+	 * Enter a parse tree produced by {@link NFCPUserParser#define_bool}.
 	 * @param ctx the parse tree
 	 */
-	void enterTraffic_type(NFCPUserParser.Traffic_typeContext ctx);
+	void enterDefine_bool(NFCPUserParser.Define_boolContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link NFCPUserParser#traffic_type}.
+	 * Exit a parse tree produced by {@link NFCPUserParser#define_bool}.
 	 * @param ctx the parse tree
 	 */
-	void exitTraffic_type(NFCPUserParser.Traffic_typeContext ctx);
+	void exitDefine_bool(NFCPUserParser.Define_boolContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link NFCPUserParser#basic_traffic_type}.
+	 * Enter a parse tree produced by {@link NFCPUserParser#define_nlist}.
 	 * @param ctx the parse tree
 	 */
-	void enterBasic_traffic_type(NFCPUserParser.Basic_traffic_typeContext ctx);
+	void enterDefine_nlist(NFCPUserParser.Define_nlistContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link NFCPUserParser#basic_traffic_type}.
+	 * Exit a parse tree produced by {@link NFCPUserParser#define_nlist}.
 	 * @param ctx the parse tree
 	 */
-	void exitBasic_traffic_type(NFCPUserParser.Basic_traffic_typeContext ctx);
+	void exitDefine_nlist(NFCPUserParser.Define_nlistContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link NFCPUserParser#nickname_nf}.
+	 * Enter a parse tree produced by {@link NFCPUserParser#define_ntuple}.
 	 * @param ctx the parse tree
 	 */
-	void enterNickname_nf(NFCPUserParser.Nickname_nfContext ctx);
+	void enterDefine_ntuple(NFCPUserParser.Define_ntupleContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link NFCPUserParser#nickname_nf}.
+	 * Exit a parse tree produced by {@link NFCPUserParser#define_ntuple}.
 	 * @param ctx the parse tree
 	 */
-	void exitNickname_nf(NFCPUserParser.Nickname_nfContext ctx);
+	void exitDefine_ntuple(NFCPUserParser.Define_ntupleContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link NFCPUserParser#nf_chain}.
+	 * Enter a parse tree produced by {@link NFCPUserParser#define_nlinkedlist}.
 	 * @param ctx the parse tree
 	 */
-	void enterNf_chain(NFCPUserParser.Nf_chainContext ctx);
+	void enterDefine_nlinkedlist(NFCPUserParser.Define_nlinkedlistContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link NFCPUserParser#nf_chain}.
+	 * Exit a parse tree produced by {@link NFCPUserParser#define_nlinkedlist}.
 	 * @param ctx the parse tree
 	 */
-	void exitNf_chain(NFCPUserParser.Nf_chainContext ctx);
+	void exitDefine_nlinkedlist(NFCPUserParser.Define_nlinkedlistContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link NFCPUserParser#nf}.
+	 * Enter a parse tree produced by {@link NFCPUserParser#define_nfinstance}.
 	 * @param ctx the parse tree
 	 */
-	void enterNf(NFCPUserParser.NfContext ctx);
+	void enterDefine_nfinstance(NFCPUserParser.Define_nfinstanceContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link NFCPUserParser#nf}.
+	 * Exit a parse tree produced by {@link NFCPUserParser#define_nfinstance}.
 	 * @param ctx the parse tree
 	 */
-	void exitNf(NFCPUserParser.NfContext ctx);
+	void exitDefine_nfinstance(NFCPUserParser.Define_nfinstanceContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link NFCPUserParser#define_flowspec}.
+	 * @param ctx the parse tree
+	 */
+	void enterDefine_flowspec(NFCPUserParser.Define_flowspecContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link NFCPUserParser#define_flowspec}.
+	 * @param ctx the parse tree
+	 */
+	void exitDefine_flowspec(NFCPUserParser.Define_flowspecContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link NFCPUserParser#define_nfchain}.
+	 * @param ctx the parse tree
+	 */
+	void enterDefine_nfchain(NFCPUserParser.Define_nfchainContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link NFCPUserParser#define_nfchain}.
+	 * @param ctx the parse tree
+	 */
+	void exitDefine_nfchain(NFCPUserParser.Define_nfchainContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link NFCPUserParser#configue_nfchain}.
+	 * @param ctx the parse tree
+	 */
+	void enterConfigue_nfchain(NFCPUserParser.Configue_nfchainContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link NFCPUserParser#configue_nfchain}.
+	 * @param ctx the parse tree
+	 */
+	void exitConfigue_nfchain(NFCPUserParser.Configue_nfchainContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link NFCPUserParser#flowspec}.
+	 * @param ctx the parse tree
+	 */
+	void enterFlowspec(NFCPUserParser.FlowspecContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link NFCPUserParser#flowspec}.
+	 * @param ctx the parse tree
+	 */
+	void exitFlowspec(NFCPUserParser.FlowspecContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link NFCPUserParser#netfunction_chain}.
+	 * @param ctx the parse tree
+	 */
+	void enterNetfunction_chain(NFCPUserParser.Netfunction_chainContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link NFCPUserParser#netfunction_chain}.
+	 * @param ctx the parse tree
+	 */
+	void exitNetfunction_chain(NFCPUserParser.Netfunction_chainContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link NFCPUserParser#netfunction}.
+	 * @param ctx the parse tree
+	 */
+	void enterNetfunction(NFCPUserParser.NetfunctionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link NFCPUserParser#netfunction}.
+	 * @param ctx the parse tree
+	 */
+	void exitNetfunction(NFCPUserParser.NetfunctionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link NFCPUserParser#nlist}.
+	 * @param ctx the parse tree
+	 */
+	void enterNlist(NFCPUserParser.NlistContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link NFCPUserParser#nlist}.
+	 * @param ctx the parse tree
+	 */
+	void exitNlist(NFCPUserParser.NlistContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link NFCPUserParser#nlist_elem}.
+	 * @param ctx the parse tree
+	 */
+	void enterNlist_elem(NFCPUserParser.Nlist_elemContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link NFCPUserParser#nlist_elem}.
+	 * @param ctx the parse tree
+	 */
+	void exitNlist_elem(NFCPUserParser.Nlist_elemContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link NFCPUserParser#ntuple}.
+	 * @param ctx the parse tree
+	 */
+	void enterNtuple(NFCPUserParser.NtupleContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link NFCPUserParser#ntuple}.
+	 * @param ctx the parse tree
+	 */
+	void exitNtuple(NFCPUserParser.NtupleContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link NFCPUserParser#ntuple_elem}.
+	 * @param ctx the parse tree
+	 */
+	void enterNtuple_elem(NFCPUserParser.Ntuple_elemContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link NFCPUserParser#ntuple_elem}.
+	 * @param ctx the parse tree
+	 */
+	void exitNtuple_elem(NFCPUserParser.Ntuple_elemContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link NFCPUserParser#nlinkedlist}.
+	 * @param ctx the parse tree
+	 */
+	void enterNlinkedlist(NFCPUserParser.NlinkedlistContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link NFCPUserParser#nlinkedlist}.
+	 * @param ctx the parse tree
+	 */
+	void exitNlinkedlist(NFCPUserParser.NlinkedlistContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link NFCPUserParser#nlinkedlist_elem}.
+	 * @param ctx the parse tree
+	 */
+	void enterNlinkedlist_elem(NFCPUserParser.Nlinkedlist_elemContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link NFCPUserParser#nlinkedlist_elem}.
+	 * @param ctx the parse tree
+	 */
+	void exitNlinkedlist_elem(NFCPUserParser.Nlinkedlist_elemContext ctx);
 }

@@ -165,9 +165,9 @@ class UDNFCPUserListener(NFCPUserListener):
 	# Enter a parse tree produced by NFCPUserParser#nf
 	def enterNf(self, ctx):
 		if ctx.WORD() != None:
-			print( "NF's name:", ctx.WORD() )
+			print( "NF's name:", str(ctx.WORD()) )
 		else:
-			print( "NF's name:", ctx.BESSNF() )
+			print( "NF's name:", str(ctx.BESSNF()) )
 		pass
 
 	# Exit a parse tree produced by NFCPUserParser#nf
