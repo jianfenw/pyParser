@@ -20,8 +20,8 @@ grammar NFCPUser ;
 total : ( line+ ) EOF ;
 
 line : ( define_int | define_float | define_string | define_bool
-	| define_nlist | define_ntuple | define_nlinkedlist
-	| define_nfinstance | define_flowspec | define_nfchain | configue_nfchain )? NEWLINE ;
+	| define_nfinstance | define_nlist | define_ntuple | define_nlinkedlist
+	| define_flowspec | define_nfchain | config_nfchain )? NEWLINE ;
 
 define_int : VARIABLENAME '=' INT ;
 
@@ -31,13 +31,13 @@ define_string : VARIABLENAME '=' STRING ;
 
 define_bool : VARIABLENAME '=' BOOL ;
 
+define_nfinstance : VARIABLENAME '=' netfunction ;
+
 define_nlist : VARIABLENAME '=' nlist ;
 
 define_ntuple : VARIABLENAME '=' ntuple ;
 
 define_nlinkedlist : VARIABLENAME '=' nlinkedlist ;
-
-define_nfinstance : VARIABLENAME '=' netfunction ;
 
 
 /*
@@ -51,35 +51,37 @@ define_flowspec : VARIABLENAME '=' flowspec ;
 
 define_nfchain : VARIABLENAME '=' netfunction_chain ;
 
-configue_nfchain : VARIABLENAME ':' VARIABLENAME ;
+config_nfchain : VARIABLENAME ':' VARIABLENAME ;
 
 
 /*
  * Network Functions
+ * - type(flowspec) = nList
+ * - type(netfunction_chain) = nlinkedlist
+ * - type(netfunction) = function with brackets
  */
 
 flowspec : nlist ;
 
 netfunction_chain : nlinkedlist ;
 
+netfunction : ( VARIABLENAME '(' ')' ) ;
 
 /*
  * Structured Data Types
  */
 
-netfunction : ( VARIABLENAME '(' ')' ) ;
-
-nlist : '[' ( (nlist_elem)? | (nlist_elem (',' nlist_elem)+) ) ']' ;
+nlist : '[' ( nlist_elem (',' nlist_elem)* ) ']' ;
 
 nlist_elem : ( ntuple | INT | FLOAT | STRING | VARIABLENAME ) ;
 
 ntuple : '{' ( ntuple_elem (',' ntuple_elem)* ) '}' ;
 
-ntuple_elem : (STRING) ':' (STRING | INT | FLOAT) ;
+ntuple_elem : (STRING) ':' ( STRING | INT | FLOAT | VARIABLENAME | nlist | nlinkedlist ) ;
 
 nlinkedlist : ( nlinkedlist_elem ( '->' nlinkedlist_elem )* ) ;
 
-nlinkedlist_elem : ( netfunction | VARIABLENAME ) ;
+nlinkedlist_elem : ( netfunction | VARIABLENAME | nlist ) ;
 
 
 /*

@@ -49,21 +49,12 @@ class NFCPUserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by NFCPUserParser#define_list.
-    def enterDefine_list(self, ctx):
+    # Enter a parse tree produced by NFCPUserParser#define_bool.
+    def enterDefine_bool(self, ctx):
         pass
 
-    # Exit a parse tree produced by NFCPUserParser#define_list.
-    def exitDefine_list(self, ctx):
-        pass
-
-
-    # Enter a parse tree produced by NFCPUserParser#define_tuple.
-    def enterDefine_tuple(self, ctx):
-        pass
-
-    # Exit a parse tree produced by NFCPUserParser#define_tuple.
-    def exitDefine_tuple(self, ctx):
+    # Exit a parse tree produced by NFCPUserParser#define_bool.
+    def exitDefine_bool(self, ctx):
         pass
 
 
@@ -73,6 +64,33 @@ class NFCPUserListener(ParseTreeListener):
 
     # Exit a parse tree produced by NFCPUserParser#define_nfinstance.
     def exitDefine_nfinstance(self, ctx):
+        pass
+
+
+    # Enter a parse tree produced by NFCPUserParser#define_nlist.
+    def enterDefine_nlist(self, ctx):
+        pass
+
+    # Exit a parse tree produced by NFCPUserParser#define_nlist.
+    def exitDefine_nlist(self, ctx):
+        pass
+
+
+    # Enter a parse tree produced by NFCPUserParser#define_ntuple.
+    def enterDefine_ntuple(self, ctx):
+        pass
+
+    # Exit a parse tree produced by NFCPUserParser#define_ntuple.
+    def exitDefine_ntuple(self, ctx):
+        pass
+
+
+    # Enter a parse tree produced by NFCPUserParser#define_nlinkedlist.
+    def enterDefine_nlinkedlist(self, ctx):
+        pass
+
+    # Exit a parse tree produced by NFCPUserParser#define_nlinkedlist.
+    def exitDefine_nlinkedlist(self, ctx):
         pass
 
 
@@ -94,30 +112,12 @@ class NFCPUserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by NFCPUserParser#configue_nfchain.
-    def enterConfigue_nfchain(self, ctx):
+    # Enter a parse tree produced by NFCPUserParser#config_nfchain.
+    def enterConfig_nfchain(self, ctx):
         pass
 
-    # Exit a parse tree produced by NFCPUserParser#configue_nfchain.
-    def exitConfigue_nfchain(self, ctx):
-        pass
-
-
-    # Enter a parse tree produced by NFCPUserParser#netfunction.
-    def enterNetfunction(self, ctx):
-        pass
-
-    # Exit a parse tree produced by NFCPUserParser#netfunction.
-    def exitNetfunction(self, ctx):
-        pass
-
-
-    # Enter a parse tree produced by NFCPUserParser#netfunction_chain.
-    def enterNetfunction_chain(self, ctx):
-        pass
-
-    # Exit a parse tree produced by NFCPUserParser#netfunction_chain.
-    def exitNetfunction_chain(self, ctx):
+    # Exit a parse tree produced by NFCPUserParser#config_nfchain.
+    def exitConfig_nfchain(self, ctx):
         pass
 
 
@@ -130,39 +130,75 @@ class NFCPUserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by NFCPUserParser#list.
-    def enterList(self, ctx):
+    # Enter a parse tree produced by NFCPUserParser#netfunction_chain.
+    def enterNetfunction_chain(self, ctx):
         pass
 
-    # Exit a parse tree produced by NFCPUserParser#list.
-    def exitList(self, ctx):
-        pass
-
-
-    # Enter a parse tree produced by NFCPUserParser#list_elem.
-    def enterList_elem(self, ctx):
-        pass
-
-    # Exit a parse tree produced by NFCPUserParser#list_elem.
-    def exitList_elem(self, ctx):
+    # Exit a parse tree produced by NFCPUserParser#netfunction_chain.
+    def exitNetfunction_chain(self, ctx):
         pass
 
 
-    # Enter a parse tree produced by NFCPUserParser#tuple.
-    def enterTuple(self, ctx):
+    # Enter a parse tree produced by NFCPUserParser#netfunction.
+    def enterNetfunction(self, ctx):
         pass
 
-    # Exit a parse tree produced by NFCPUserParser#tuple.
-    def exitTuple(self, ctx):
+    # Exit a parse tree produced by NFCPUserParser#netfunction.
+    def exitNetfunction(self, ctx):
         pass
 
 
-    # Enter a parse tree produced by NFCPUserParser#tuple_elem.
-    def enterTuple_elem(self, ctx):
+    # Enter a parse tree produced by NFCPUserParser#nlist.
+    def enterNlist(self, ctx):
         pass
 
-    # Exit a parse tree produced by NFCPUserParser#tuple_elem.
-    def exitTuple_elem(self, ctx):
+    # Exit a parse tree produced by NFCPUserParser#nlist.
+    def exitNlist(self, ctx):
+        pass
+
+
+    # Enter a parse tree produced by NFCPUserParser#nlist_elem.
+    def enterNlist_elem(self, ctx):
+        pass
+
+    # Exit a parse tree produced by NFCPUserParser#nlist_elem.
+    def exitNlist_elem(self, ctx):
+        pass
+
+
+    # Enter a parse tree produced by NFCPUserParser#ntuple.
+    def enterNtuple(self, ctx):
+        pass
+
+    # Exit a parse tree produced by NFCPUserParser#ntuple.
+    def exitNtuple(self, ctx):
+        pass
+
+
+    # Enter a parse tree produced by NFCPUserParser#ntuple_elem.
+    def enterNtuple_elem(self, ctx):
+        pass
+
+    # Exit a parse tree produced by NFCPUserParser#ntuple_elem.
+    def exitNtuple_elem(self, ctx):
+        pass
+
+
+    # Enter a parse tree produced by NFCPUserParser#nlinkedlist.
+    def enterNlinkedlist(self, ctx):
+        pass
+
+    # Exit a parse tree produced by NFCPUserParser#nlinkedlist.
+    def exitNlinkedlist(self, ctx):
+        pass
+
+
+    # Enter a parse tree produced by NFCPUserParser#nlinkedlist_elem.
+    def enterNlinkedlist_elem(self, ctx):
+        pass
+
+    # Exit a parse tree produced by NFCPUserParser#nlinkedlist_elem.
+    def exitNlinkedlist_elem(self, ctx):
         pass
 
 

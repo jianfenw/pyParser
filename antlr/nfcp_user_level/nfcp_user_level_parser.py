@@ -31,7 +31,7 @@ from antlr4 import *
 from NFCPUserLexer import NFCPUserLexer
 from NFCPUserParser import NFCPUserParser
 from NFCPUserListener import NFCPUserListener
-from UDNFCPUserListener import UDNFCPUserListener
+from UDNFCPUserListener import UDNFCPUserListener, linkedlist_node
 
 
 '''
@@ -51,7 +51,7 @@ No.		Syntax 						Semantics
 '''
 
 
-
+"""
 def nf_chain_get_nf_node_list(scanner):
 	p4_list, bess_list = [], []
 	curr_sp = 1
@@ -82,7 +82,14 @@ def nf_chain_get_nf_node_list(scanner):
 	#print "# of P4 nodes:", len(p4_list)
 	#print "# of BESS nodes:", len(bess_list)
 	return p4_list, bess_list
+"""
 
+
+def nf_chain_get_nf_node_graph(scanner):
+
+
+
+	return
 
 
 def nf_chain_parser_main(config_filename):
@@ -112,13 +119,35 @@ def nf_chain_parser_main(config_filename):
 	walker = ParseTreeWalker()
 	walker.walk(scanner, tree)
 	print("Walker: OK")
+	
+	print "Tests for basic data types"
+	print "# 1 Lookup Table for INT variables:", scanner.var_int_dict
+	print "# 2 Lookup Table for FLOAT variables:", scanner.var_float_dict
+	print "# 3 Lookup Table for STRING variables:", scanner.var_string_dict
+	print "# 4 Lookup Table for BOOL variables:", scanner.var_bool_dict
 
-	print "# 1 Nickname - NF mapping:", scanner.nickname_nf_mapping
-	print "# 2 Nickname - TT mapping:", scanner.nickname_tt_mapping
-	print "# 3 Nickname - SP mapping:", scanner.nickname_sp_mapping
-	print '# 4 TT - SP mapping:', scanner.tt_sp_mapping
+	print "Tests for NetFunctions"
+	print "# 5 Lookup Table for NetFunc instances:", scanner.func_dict
+
+	print "Tests for structured data types - ntuple, nlist, nlinkedlist"
+	print "# 6 Lookup Table for ntuple instances:", scanner.struct_ntuple_dict
+	print "# 7 Lookup Table for nlist instances:", scanner.struct_nlist_dict
+	print "# 8 Lookup Table for nlinkedlist instances:", scanner.struct_nlinkedlist_dict
+	for key, val in scanner.struct_nlinkedlist_dict.items():
+		print '-', key, '-length', val.get_length()
+
+	#print "# 9 Print a nlinkedlist w/o branches:"
+	#print "- linkedlist_a:", scanner.struct_nlinkedlist_dict['linkedlist_a']
+	#print "- linkedlist_b:", scanner.struct_nlinkedlist_dict['linkedlist_b']
+	print "- sp_2:", scanner.struct_nlinkedlist_dict['sp_2']
+	print "# 10 Print a nlinkedlist with branches:"
+	print "- sp_1:", scanner.struct_nlinkedlist_dict['sp_1']
+
+	return None, None # test walker for basic data types, and structured data types
+
 	print 'Total # of SP:', scanner.service_path_count
 	print scanner.overall_nf_chain_list
+
 	print("NFCP User-Level Parser Finished!")
 
 	p4_list, bess_list = nf_chain_get_nf_node_list(scanner)
@@ -132,10 +161,11 @@ def nf_chain_parser_tester(argv):
 	subprocess.call(['ls', './user_level_examples'])
 	# return # for test subprocess
 
-	config_filename = raw_input("Please input the NF chain configuration filename:\n")
-	#config_filename = 'example.conf'
-	p4_list, bess_list = nf_chain_parser_main('./user_level_examples/'+config_filename)
-
+	#config_filename = raw_input("Please input the NF chain configuration filename:\n")
+	#p4_list, bess_list = nf_chain_parser_main('./user_level_examples/'+config_filename)
+	config_filename = 'example.conf'
+	p4_list, bess_list = nf_chain_parser_main(config_filename)
+	return
 	# Test whether the service_path_id and service_id are correctly set up
 	print("# of P4 modules: %d, # of BESS modules: %d" %( len(p4_list), len(bess_list) ))
 	for p4_node in p4_list:
