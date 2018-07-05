@@ -143,6 +143,9 @@ def nf_chain_parser_main(config_filename):
 	print "# 10 Print a nlinkedlist with branches:"
 	print "- sp_1:", scanner.struct_nlinkedlist_dict['sp_1']
 
+	print "# 11 Print a formatted Network Function Chain:"
+	print scanner.struct_nlinkedlist_dict['sp_2']._draw_pipeline()
+
 	return None, None # test walker for basic data types, and structured data types
 
 	print 'Total # of SP:', scanner.service_path_count

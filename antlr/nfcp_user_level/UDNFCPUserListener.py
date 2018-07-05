@@ -1,5 +1,6 @@
 from __future__ import print_function
 import sys
+import subprocess
 import copy
 from antlr4 import *
 from NFCPUserParser import NFCPUserParser
@@ -9,6 +10,54 @@ global spi_val, si_val
 
 spi_val = 0
 si_val = 0
+
+
+class tmp_nf_node(object):
+	def __init__(self):
+		self.name = None
+		self.nf_class = ""
+		self.spi = 0
+		self.si = 0
+		self.visited = False
+		self.next = []
+
+	def setup(self, ll_node):
+		self.name = ll_node.instance
+		self.spi = ll_node.spi
+		self.si = ll_node.si
+		return
+
+	def get_nf_node_list(self):
+		res_list = []
+		res_list.append(self)
+
+		for tmp_node in self.next:
+			res_list += tmp_node.get_nf_node_list()
+
+		return res_list
+
+def convert_graph(ll_node):
+	"""
+	convert a ll_node graph into a tmp_nf_node graph (a complete graph)
+	"""
+	root_node = None
+	curr_node = None
+	prev_ll_node = None
+	curr_ll_node = ll_node
+
+	while curr_ll_node != None:
+		new_node = curr_ll_node.get_tmp_nf_node()
+		if root_node == None:
+			root_node = new_node
+			curr_node = root_node
+		else:
+			curr_node.next.append(new_node)
+			curr_node = new_node
+
+		prev_ll_node = curr_ll_node
+		curr_ll_node = curr_ll_node.next
+	return root_node
+
 
 class linkedlist_node(object):
 	def __init__(self):
@@ -33,6 +82,13 @@ class linkedlist_node(object):
 
 	def set_transition_condition(self, ntuple_instance):
 		self.transition_condition = ntuple_instance
+
+	def get_tmp_nf_node(self):
+		if len(self.branch) == 0:
+			# process a non-branch node
+			new_node = tmp_nf_node()
+			new_node.setup(self)
+			return new_node
 
 	def get_length(self):
 		return len(self)
@@ -80,17 +136,54 @@ class linkedlist_node(object):
 		return
 
 
-	def print_pipeline(self):
+	def ll_node_tail(self):
+		if self.next == None:
+			return self
+		else:
+			return self.next.ll_node_tail()
+
+	def _draw_pipeline(self, graph_args=None):
 		"""
 		print_pipeline:
 		Print the whole pipeline.
 		1. start with a linear NF chain, which does not have any branch
 		2. handle the branch struct
 		"""
-		
+		# generate the NF placement graph (in the output format)
 
+		if graph_args is None:
+			graph_args = []
 
-		return
+		nf_graph = convert_graph(self)
+		modules = nf_graph.get_nf_node_list()
+		#print(len(modules))
+		names = []
+		node_labels = {}
+
+		for m in modules:
+			name = m.name
+			mclass = m.nf_class
+			names.append(name)
+			node_labels[name] = '%s\\n%s' %(name, mclass)
+
+		spi_start = self.spi
+		spi_end = self.ll_node_tail().spi
+
+		try:
+			f = subprocess.Popen('graph-easy ' + ' '.join(graph_args), shell=True,\
+				stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE )
+
+			for i in range(len(names)-1):
+				print('[%s] -> [%s]' %(node_labels[names[i]], node_labels[names[i+1]]), file=f.stdin )
+			output, error = f.communicate()
+			f.wait()
+			return output
+
+		except IOError as e:
+			if e.errno == errno.EPIPE:
+				raise cli.CommandError('"graph-easy" program is not available')
+			else:
+				raise
 
 	def __str__(self):
 		res_str = ""
