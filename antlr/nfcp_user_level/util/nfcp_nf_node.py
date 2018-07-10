@@ -95,9 +95,11 @@ class nf_node(object):
 
     def __init__(self, nf_name=None, service_path_id = -1, seq_index = -1):
         self.name = nf_name
+        self.nf_class = None
         self.service_path_id = service_path_id
         self.service_id = seq_index
         self.nf_type = nfcp_module_type(nf_name)
+        self.adj_nodes = []
 
         self.arg = None
         self.nickname = None

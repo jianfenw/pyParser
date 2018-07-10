@@ -139,18 +139,28 @@ def nf_chain_parser_main(config_filename):
 	#print "# 9 Print a nlinkedlist w/o branches:"
 	#print "- linkedlist_a:", scanner.struct_nlinkedlist_dict['linkedlist_a']
 	#print "- linkedlist_b:", scanner.struct_nlinkedlist_dict['linkedlist_b']
-	print "- sp_2:", scanner.struct_nlinkedlist_dict['sp_2']
-	print "# 10 Print a nlinkedlist with branches:"
-	print "- sp_1:", scanner.struct_nlinkedlist_dict['sp_1']
+	print "# 10 Print a nlinkedlist:"
+	print "  - sp_1:", scanner.struct_nlinkedlist_dict['sp_1']
+	print "print all nodes in netchain sp_1"
+	service_path_1 = scanner.struct_nlinkedlist_dict['sp_1'].get_all_nodes()
+	for node in service_path_1:
+		print node.instance, node.spi, node.si
+
+	print "  - sp_2:", scanner.struct_nlinkedlist_dict['sp_2']
+	print "print all nodes in netchain sp_2"
+	service_path_2 = scanner.struct_nlinkedlist_dict['sp_2'].get_all_nodes()
+	for node in service_path_2:
+		print node.instance, node.spi, node.si
 
 	print "# 11 Print a formatted Network Function Chain:"
-	print scanner.struct_nlinkedlist_dict['sp_2']._draw_pipeline()
+	print '  - sp_1:\n', scanner.struct_nlinkedlist_dict['sp_1']._draw_pipeline()
+	print '  - sp_2:\n', scanner.struct_nlinkedlist_dict['sp_2']._draw_pipeline()
+	print '  - sp_3:\n', scanner.struct_nlinkedlist_dict['sp_3']._draw_pipeline()
 
 	return None, None # test walker for basic data types, and structured data types
 
 	print 'Total # of SP:', scanner.service_path_count
 	print scanner.overall_nf_chain_list
-
 	print("NFCP User-Level Parser Finished!")
 
 	p4_list, bess_list = nf_chain_get_nf_node_list(scanner)
