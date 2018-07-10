@@ -149,6 +149,12 @@ def convert_nf_graph(ll_node):
 	new_node_list = None
 	prev_node_list = None
 
+	if next_ll_node == None:
+		node_c = tmp_nf_node(curr_ll_node)
+		res_graph.add_module(node_c)
+		res_graph.heads.append(node_c)
+		res_graph.tails.append(node_c)
+
 	while next_ll_node != None:
 		# curr_ll_node and next_ll_node are non-empty node
 		if len(curr_ll_node.branch) == 0 and len(next_ll_node.branch) == 0:
@@ -176,15 +182,12 @@ def convert_nf_graph(ll_node):
 					res_graph.add_edge(node_c, head_node)
 			res_graph.tails = tmp_tail
 		elif len(curr_ll_node.branch) != 0 and len(next_ll_node.branch) == 0:
-			"""
 			# 3. curr: branch, next: non-branch
 			node_n = tmp_nf_node(next_ll_node)
-			for curr_branch in curr_ll_node.branch:
-				curr_branch_graph = convert_nf_graph(curr_branch)
-				# for each tail node
-				for tail_node in curr_branch_graph.tails:
-					res_graph.add_edge(tail_node, node_n)
-			"""
+			res_graph.add_module(node_n)
+			for tail_node in res_graph.tails:
+				tail_node.add_neighbor(node_n)
+			res_graph.tails = [node_n]
 		else:
 			pass
 		curr_ll_node = next_ll_node
