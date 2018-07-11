@@ -1,11 +1,7 @@
 """
 * 
-* NF_CHAIN_PARSER.PY - 
+* NFCP_USER_LEVEL_PARSER.PY - 
 * This script is used to parse the NFCP user-level configuration file.
-* 
-* The user-level configuration file looks like the following - 
-* L2 -> L3 -> ACL
-* (The NF chain contains 3 network functions, i.e. L2, L3, and ACL)
 * 
 * The script will parse network functions in the NF chain.
 * These NFs will be stored in two lists, one for P4 libraries and the other one for 
@@ -16,7 +12,7 @@
 * file, which can be directly run in the BESS system (bessctl).
 * 
 * Author: Jianfeng Wang
-* Time: 01-19-2017
+* Time: 06-19-2018
 * Email: jianfenw@usc.edu
 *
 """
@@ -41,15 +37,14 @@ from UDNFCPUserListener import UDNFCPUserListener, linkedlist_node
 --------------------------------------------------------------------------------
 No.		Syntax 						Semantics 				
 --------------------------------------------------------------------------------
-1		a -> b 						Connect module a and b
-2		{'TCP', 'dport', '1000'}	Define a traffic type
-3		{} : a -> b -> c 			Assign a traffic type to a network function chain
-4		traff_a::{}					Assign a nickname to a traffic type
-5		traff_a : a -> b -> c 		Assign a traffic name to a network function chain
-6 		nick_name::standard_name 	Assign a nickname to a standard name
-7 		a -> nick_name -> b 		Use a nickname to represent a standard module
-'''
+1		{'dst_ip':'1.0.1.1'}		Define a flowspec
+2		traff_a : [{}, {}]			Define a flowspec instance
+3 		instance_name = nf_module()	Define a NF instance
+4		a -> b 						Connect module a with b
+5 		a() -> instance -> b() 		Use a instance to represent a standard module
+6		traff_a : a -> b -> c 		Assign a traffic name to a network function chain
 
+'''
 
 """
 def nf_chain_get_nf_node_list(scanner):
@@ -84,24 +79,17 @@ def nf_chain_get_nf_node_list(scanner):
 	return p4_list, bess_list
 """
 
-
 def nf_chain_get_nf_node_graph(scanner):
-
-
-
 	return
 
 
 def nf_chain_parser_main(config_filename):
 	"""
 	This function is used to parse the NFCP user-level configuration script.
-	It will return:
-	(1) nickname - nf mapping
-	(2) nickname - tt mapping
-	(3) tt - nf chain mapping
-	(4) nickname - nf chain mapping
+	Please refer to the NFCP user-level language book to see all details.
+	Input: filename(type=str)
+	Output: scanner (UDNFCPUserListener)
 	"""
-
 	nickname_nf_mapping = {}
 
 	conf_input = FileStream(config_filename)
@@ -120,6 +108,13 @@ def nf_chain_parser_main(config_filename):
 	walker.walk(scanner, tree)
 	print("Walker: OK")
 	
+	return scanner
+
+
+def nf_chain_parser_tester(argv):
+	"""
+	"""
+
 	print "Tests for basic data types"
 	print "# 1 Lookup Table for INT variables:", scanner.var_int_dict
 	print "# 2 Lookup Table for FLOAT variables:", scanner.var_float_dict
