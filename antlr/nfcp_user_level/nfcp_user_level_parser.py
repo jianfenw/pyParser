@@ -156,6 +156,7 @@ def nf_chain_parser_main(config_filename):
 	print '  - sp_1:\n', scanner.struct_nlinkedlist_dict['sp_1']._draw_pipeline()
 	print '  - sp_2:\n', scanner.struct_nlinkedlist_dict['sp_2']._draw_pipeline()
 	print '  - sp_3:\n', scanner.struct_nlinkedlist_dict['sp_3']._draw_pipeline()
+	print '  - sp_4:\n', scanner.struct_nlinkedlist_dict['sp_4']._draw_pipeline()
 
 	return None, None # test walker for basic data types, and structured data types
 

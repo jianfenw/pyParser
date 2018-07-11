@@ -164,25 +164,30 @@ def convert_nf_graph(ll_node):
 			res_graph.add_edge(node_c, node_n)
 		elif len(curr_ll_node.branch) == 0 and len(next_ll_node.branch) != 0:
 			# 2. curr: non-branch, next: branch
+			print("curr:", curr_ll_node, "n")
 			node_c = tmp_nf_node(curr_ll_node)
 			tmp_tail = []
+			branch_idx = 0
 			for curr_branch in next_ll_node.branch:
+				branch_idx += 1
+				# for each branch, we get the sub-grahn
 				curr_branch_graph = convert_nf_graph(curr_branch)
 				tmp_tail += curr_branch_graph.tails
 				# merge the two graphs
 				for node in curr_branch_graph.list_modules():
 					# process each node in the subchain graph
 					if len(node.adj_nodes) != 0:
-						print(node.name, node.adj_nodes[0].name)
+						print("Branch %d: [%s]->[%s]" %(branch_idx, node.name, node.adj_nodes[0].name))
 					res_graph.add_module(node)
 				
 				for head_node in curr_branch_graph.heads:
 					# We create a link from the res_graph's tail to the branch's head node
-					print(head_node.name)
+					print("Branch %d: head node [%s]" %(branch_idx, head_node.name))
 					res_graph.add_edge(node_c, head_node)
 			res_graph.tails = tmp_tail
 		elif len(curr_ll_node.branch) != 0 and len(next_ll_node.branch) == 0:
 			# 3. curr: branch, next: non-branch
+			print("curr:", curr_ll_node, "c")
 			node_n = tmp_nf_node(next_ll_node)
 			res_graph.add_module(node_n)
 			for tail_node in res_graph.tails:
