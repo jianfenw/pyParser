@@ -1,21 +1,19 @@
+
 """
 * 
-* NFCP_USER_LEVEL_PARSER.PY - 
+* Title: nfcp_user_level_parser.py
+* Description:
 * This script is used to parse the NFCP user-level configuration file.
-* 
-* The script will parse network functions in the NF chain.
-* These NFs will be stored in two lists, one for P4 libraries and the other one for 
-* BESS modules. 
-* There are two modules that process the two sets seperately. For P4 libraries, the 
-* P4 parser module will combine all P4 libraries together and output the final P4 code. 
-* For BESS modules, the BESS parser module will generate a correct BESS configuration 
-* file, which can be directly run in the BESS system (bessctl).
+* In fact, the parser is a class that encapsulates the language lexer, parser, and
+* other logic. Most of language-related functions are provided by the 'scanner'.
+* Other member functions help the rest of our pipeline.
 * 
 * Author: Jianfeng Wang
-* Time: 06-19-2018
+* Time: 06/19/2018
 * Email: jianfenw@usc.edu
 *
 """
+
 import sys
 import os
 import subprocess
@@ -24,11 +22,10 @@ import copy
 from util.nfcp_nf_node import *
 from util.lang_parser_helper import *
 from antlr4 import *
-from NFCPUserLexer import NFCPUserLexer
-from NFCPUserParser import NFCPUserParser
-from NFCPUserListener import NFCPUserListener
-from UDNFCPUserListener import UDNFCPUserListener, linkedlist_node
-
+from user_level_parser.NFCPUserLexer import NFCPUserLexer
+from user_level_parser.NFCPUserParser import NFCPUserParser
+from user_level_parser.NFCPUserListener import NFCPUserListener
+from user_level_parser.UDNFCPUserListener import UDNFCPUserListener, linkedlist_node, convert_nf_graph
 
 '''
 <NFCP script language>
@@ -44,77 +41,105 @@ No.		Syntax 						Semantics
 5 		a() -> instance -> b() 		Use a instance to represent a standard module
 6		traff_a : a -> b -> c 		Assign a traffic name to a network function chain
 
+* Please see NFCP language book to get more details. *
 '''
 
-"""
-def nf_chain_get_nf_node_list(scanner):
-	p4_list, bess_list = [], []
-	curr_sp = 1
-	curr_idx = 1
-	nsh_encap_required = True
-	for nf_chain in scanner.overall_nf_chain_list:
-		for nf in nf_chain:
-			nf_name = copy.deepcopy(nf)
-			tmp_nf_node = nf_node(nf_name, curr_sp, curr_idx)
-			if tmp_nf_node.nf_type == 0: # nf_type == 0 (unknown NF name - must be a nickname)
-				nf_name = scanner.nickname_nf_mapping[nf_name]
-				nf_name = nfcp_get_bess_module_name(nf_name)
-				tmp_nf_node = nf_node(nf_name, curr_sp, curr_idx)
+class nfcp_config_parser(object):
+	def __init__(self, conf_filename=None):
+		self.conf_filename = None
+		self.scanner = None
+		self.total_chain_count = -1
+		if conf_filename != None:
+			self.conf_parser_process(conf_filename)
+		return
 
-			if tmp_nf_node.nf_type == 1: # P4 node
-				p4_list.append(tmp_nf_node)
-				nsh_encap_required = True
-			elif tmp_nf_node.nf_type == 2: # BESS node (however, we still have to create a NSHEncap on P4 side)
-				bess_list.append(tmp_nf_node)
-				if nsh_encap_required:
-					nsh_encap_node = nf_node('NSHEncap', curr_sp, curr_idx)
-					p4_list.append(nsh_encap_node)
-					nsh_encap_required = False
-			
-			curr_idx += 1
-		curr_sp += 1
-		curr_idx = 1
-	#print "# of P4 nodes:", len(p4_list)
-	#print "# of BESS nodes:", len(bess_list)
-	return p4_list, bess_list
-"""
+	def conf_parser_process(self, conf_filename):
+		if conf_filename != None:
+			self.conf_filename = conf_filename
+			self.conf_parser_main(self.conf_filename)
+		return
 
-def nf_chain_get_nf_node_graph(scanner):
-	return
+	def conf_parser_main(self, conf_filename):
+		"""
+		This function is used to parse the NFCP user-level configuration script.
+		Please refer to the NFCP user-level language book to see all details.
+		Input: filename (type=str)
+		Output: scanner (type=UDNFCPUserListener)
+		"""
+		conf_input = FileStream(conf_filename)
+		lexer = NFCPUserLexer(conf_input)
+		print("Lang Lexer: OK")
+
+		stream = CommonTokenStream(lexer)
+		print("Lang Stream: OK")
+
+		parser = NFCPUserParser(stream)
+		print("Lang Parser: OK")
+
+		tree = parser.total()
+		scanner = UDNFCPUserListener()
+		walker = ParseTreeWalker()
+		walker.walk(scanner, tree)
+		print("Lang ParseTree Walker: OK") 
+		self.scanner = scanner
+		return
+
+	def conf_parser_get_all_nodes(self):
+		"""
+		Input: None
+		Output: a list of all nf_node
+		"""
+		res_node_list = []
+		# nf_chains = [all chain's root ll_node's name]
+		nf_chains = sorted(self.scanner.flowspec_nfchain_mapping.values())
+		for curr_chain_name in nf_chains:
+			curr_chain = self.scanner.struct_nlinkedlist_dict[curr_chain_name]
+			curr_chain_graph = convert_nf_graph(curr_chain)
+			curr_nodes = curr_chain_graph.list_modules()
+			res_node_list += curr_nodes
+			print ' - %s modules(%s) in chain "%s"' %(len(curr_nodes), str(type(curr_nodes[0])), curr_chain_name)
+		return res_node_list
+
+	def conf_parser_get_p4_nodes(self):
+		res_p4_list = []
+		nsh_encap_required = True
+		
+		# nf_chains = [all chain's root ll_node]
+		nf_chains = scanner.flowspec_nfchain_mapping.values()
+		nf_chain_graphs = []
+		for curr_chain in nf_chains:
+			curr_chain_graph = convert_nf_graph(curr_chain)
+			curr_nodes = curr_chain_graph.list_modules()
+			res_p4_list += curr_nodes
+
+		print "# of nodes:", len(res_p4_list)
+		return res_p4_list
+
+	def conf_parser_get_bess_nodes(self):
+		
+		pass
+
+	def conf_parser_get_all_graph(self):
+
+		return
 
 
-def nf_chain_parser_main(config_filename):
+
+def nf_chain_parser_example_tester(input_parser, argv=None):
 	"""
-	This function is used to parse the NFCP user-level configuration script.
-	Please refer to the NFCP user-level language book to see all details.
-	Input: filename(type=str)
-	Output: scanner (UDNFCPUserListener)
+	nf_chain_parser_tester:
+	This tester is aimed to test the user-level language parser.
+	(1) basic data types
+	(2) structed data types
+	(3) define network functions
+	(4) define flow spec
+	(5) define network function service chain
+	(5) configure NF chain with flowspec
+
+	Input: None
+	Output: None
 	"""
-	nickname_nf_mapping = {}
-
-	conf_input = FileStream(config_filename)
-	lexer = NFCPUserLexer(conf_input)
-	print("Lexer: OK")
-
-	stream = CommonTokenStream(lexer)
-	print("Stream: OK")
-
-	parser = NFCPUserParser(stream)
-	print("Parser: OK")
-
-	tree = parser.total()
-	scanner = UDNFCPUserListener()
-	walker = ParseTreeWalker()
-	walker.walk(scanner, tree)
-	print("Walker: OK")
-	
-	return scanner
-
-
-def nf_chain_parser_tester(argv):
-	"""
-	"""
-
+	scanner = input_parser.scanner
 	print "Tests for basic data types"
 	print "# 1 Lookup Table for INT variables:", scanner.var_int_dict
 	print "# 2 Lookup Table for FLOAT variables:", scanner.var_float_dict
@@ -153,40 +178,32 @@ def nf_chain_parser_tester(argv):
 	print '  - sp_3:\n', scanner.struct_nlinkedlist_dict['sp_3']._draw_pipeline()
 	print '  - sp_4:\n', scanner.struct_nlinkedlist_dict['sp_4']._draw_pipeline()
 
-	return None, None # test walker for basic data types, and structured data types
-
-	print 'Total # of SP:', scanner.service_path_count
-	print scanner.overall_nf_chain_list
+	print "# 12 Statistics:"
+	print 'Total # of service paths:', scanner.service_path_count
+	print 'Total # of NF moduels', nf_chain_get_all_nodes(scanner)
+	#print scanner.overall_nf_chain_list
 	print("NFCP User-Level Parser Finished!")
 
-	p4_list, bess_list = nf_chain_get_nf_node_list(scanner)
-	return p4_list, bess_list
+	#p4_list, bess_list = nf_chain_get_nf_node_list(scanner)
+	return
 
 
 def nf_chain_parser_tester(argv):
 	print "NF Chain Parser begins:"
-	
 	print "List all user-level configuration scripts:"
 	subprocess.call(['ls', './user_level_examples'])
-	# return # for test subprocess
-
 	#config_filename = raw_input("Please input the NF chain configuration filename:\n")
 	#p4_list, bess_list = nf_chain_parser_main('./user_level_examples/'+config_filename)
 	config_filename = 'example.conf'
-	p4_list, bess_list = nf_chain_parser_main(config_filename)
-	return
+	test_parser = nfcp_config_parser(config_filename)
+	nf_chain_parser_example_tester(test_parser)
 	# Test whether the service_path_id and service_id are correctly set up
-	print("# of P4 modules: %d, # of BESS modules: %d" %( len(p4_list), len(bess_list) ))
-	for p4_node in p4_list:
-		print "%s: sp=%d, sidx=%d" %(p4_node.name, p4_node.service_path_id, p4_node.service_id)
-
+	#print("# of P4 modules: %d, # of BESS modules: %d" %( len(p4_list), len(bess_list) ))
+	#for p4_node in p4_list:
+	#	print "%s: sp=%d, sidx=%d" %(p4_node.name, p4_node.service_path_id, p4_node.service_id)
 	return
 
 
 if __name__ == '__main__':
 	nf_chain_parser_tester(sys.argv)
-
-
-
-
 

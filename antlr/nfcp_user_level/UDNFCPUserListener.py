@@ -1,21 +1,25 @@
 """
 * 
-* UDNFCPUserListener.PY - 
-* This script is used to parse the NFCP user-level configuration file.
+* Title: UDNFCPUserListener.py
+* Description:
+* This function contains the user-defined parser class. The class contains all 
+* necessary functions, which would be triggered when traversing the AST.
 * 
 * Author: Jianfeng Wang
-* Time: 01-19-2017
+* Time: 06/10/2018
 * Email: jianfenw@usc.edu
 *
 """
 
 from __future__ import print_function
 import sys
+sys.path.append('..')
 import subprocess
 import copy
 from antlr4 import *
 from NFCPUserParser import NFCPUserParser
 from NFCPUserListener import NFCPUserListener
+from util.nfcp_nf_node import nf_chain_graph, nf_node
 
 global spi_val, si_val
 
@@ -23,124 +27,12 @@ spi_val = 0
 si_val = 0
 
 
-class nf_chain_graph(object):
-	def __init__(self):
-		self.module_list = {}
-		self.module_num = 0
-		# self.heads contains all nodes that does not have parent nodes
-		# self.tails contains all nodes that does not have child nodes
-		self.heads = []
-		self.tails = []
-
-	def add_module(self, nf_node):
-		module_key = nf_node.name
-		self.module_list[module_key] = nf_node
-		self.module_num += 1
-		return
-
-	def get_module(self, module_key):
-		if module_key in self.module_list.keys():
-			return self.module_list[module_key]
-		else:
-			return None
-
-	def add_edge(self, src, dst):
-		# type(src), type(dst) == nf_node
-		if src.name not in self.module_list:
-			self.add_module(src)
-			self.heads.append(src)
-			self.tails.append(src)
-		else:
-			src = self.module_list[src.name]
-		if dst.name not in self.module_list:
-			self.add_module(dst)
-			self.heads.append(dst)
-			self.tails.append(dst)
-		else:
-			dst = self.module_list[dst.name]
-		if dst in src.adj_nodes:
-			return
-
-		if src in self.tails: # src is a new parent
-			self.tails.remove(src)
-		if dst in self.heads: # dst is a new child
-			self.heads.remove(dst)
-		
-		self.module_list[src.name].add_neighbor(dst)
-		return
-
-	def __contains__(self, target_key):
-		return (target_key in self.module_list)
-
-	def list_modules(self):
-		return self.module_list.values()
-
-	def __iter__(self):
-		return iter(self.module_list.values())
-
-
-class tmp_nf_node(object):
-	def __init__(self, ll_node=None):
-		self.name = None
-		self.nf_class = ""
-		self.spi = 0
-		self.si = 0
-		self.adj_nodes = []
-		# connection_status:
-		# 1. self.is_parent: the node is a parent node of another node
-		# 2. self.is_child: the node is a child node of another node
-		#self.is_parent = False
-		#self.is_child = False
-		if ll_node != None:
-			self.setup(ll_node)
-
-	def __cmp__(self, other_node):
-		if self.name < other_node.name:
-			return -1
-		elif self.name > other_node.name:
-			return 1
-		else:
-			if self.spi < other_node.spi:
-				return -1
-			elif self.spi == other_node.spi:
-				if self.si < other_node.si:
-					return -1
-				elif self.si == other_node.si:
-					return 0
-				else:
-					return 1
-			else:
-				return 1
-
-	def setup(self, ll_node):
-		self.name = ll_node.instance
-		self.spi = ll_node.spi
-		self.si = ll_node.si
-		return
-
-	def get_nf_node_list(self):
-		"""
-		get_nf_node_list:
-		This function returns a list of nf_node. It contains every nodes in the current
-		NF graph, starting from the current node.
-		"""
-		res_list = []
-		res_list.append(self)
-		for tmp_node in self.adj_nodes:
-			res_list += tmp_node.get_nf_node_list()
-		return res_list
-
-	def add_neighbor(self, neighbor):
-		self.adj_nodes.append(neighbor)
-		return
-
-
 def convert_nf_graph(ll_node):
 	"""
 	convert_nf_graph:
-	This function converts a ll_node graph into a tmp_nf_node graph 
-	(a complete graph).
-	(It is good to use a special definition of NF nodes, instead of ll_node)
+	This function converts a ll_node graph into a nf_node graph (a complete graph).
+	(For the convenience of further processing, we use a special definition of NF 
+	nodes, i.e. nf_node, instead of ll_node)
 	"""
 	res_graph = nf_chain_graph()
 	# the elem to iterate through the linked list
@@ -150,7 +42,8 @@ def convert_nf_graph(ll_node):
 	prev_node_list = None
 
 	if next_ll_node == None:
-		node_c = tmp_nf_node(curr_ll_node)
+		#node_c = tmp_nf_node(curr_ll_node)
+		node_c = nf_node(curr_ll_node)
 		res_graph.add_module(node_c)
 		res_graph.heads.append(node_c)
 		res_graph.tails.append(node_c)
@@ -159,13 +52,16 @@ def convert_nf_graph(ll_node):
 		# curr_ll_node and next_ll_node are non-empty node
 		if len(curr_ll_node.branch) == 0 and len(next_ll_node.branch) == 0:
 			# 1. curr: non-branch, next: non_branch
-			node_c = tmp_nf_node(curr_ll_node)
-			node_n = tmp_nf_node(next_ll_node)
+			#node_c = tmp_nf_node(curr_ll_node)
+			#node_n = tmp_nf_node(next_ll_node)
+			node_c = nf_node(curr_ll_node)
+			node_n = nf_node(next_ll_node)
 			res_graph.add_edge(node_c, node_n)
 		elif len(curr_ll_node.branch) == 0 and len(next_ll_node.branch) != 0:
 			# 2. curr: non-branch, next: branch
-			print("curr:", curr_ll_node, "n")
-			node_c = tmp_nf_node(curr_ll_node)
+			#print("curr:", curr_ll_node, "n")
+			#node_c = tmp_nf_node(curr_ll_node)
+			node_c = nf_node(curr_ll_node)
 			tmp_tail = []
 			branch_idx = 0
 			for curr_branch in next_ll_node.branch:
@@ -176,19 +72,20 @@ def convert_nf_graph(ll_node):
 				# merge the two graphs
 				for node in curr_branch_graph.list_modules():
 					# process each node in the subchain graph
-					if len(node.adj_nodes) != 0:
-						print("Branch %d: [%s]->[%s]" %(branch_idx, node.name, node.adj_nodes[0].name))
+					#if len(node.adj_nodes) != 0:
+					#	print("Branch %d: [%s]->[%s]" %(branch_idx, node.name, node.adj_nodes[0].name))
 					res_graph.add_module(node)
 				
 				for head_node in curr_branch_graph.heads:
 					# We create a link from the res_graph's tail to the branch's head node
-					print("Branch %d: head node [%s]" %(branch_idx, head_node.name))
+					#print("Branch %d: head node [%s]" %(branch_idx, head_node.name))
 					res_graph.add_edge(node_c, head_node)
 			res_graph.tails = tmp_tail
 		elif len(curr_ll_node.branch) != 0 and len(next_ll_node.branch) == 0:
 			# 3. curr: branch, next: non-branch
-			print("curr:", curr_ll_node, "c")
-			node_n = tmp_nf_node(next_ll_node)
+			#print("curr:", curr_ll_node, "c")
+			#node_n = tmp_nf_node(next_ll_node)
+			node_n = nf_node(next_ll_node)
 			res_graph.add_module(node_n)
 			for tail_node in res_graph.tails:
 				tail_node.add_neighbor(node_n)
@@ -199,59 +96,18 @@ def convert_nf_graph(ll_node):
 		next_ll_node = next_ll_node.next
 	return res_graph
 
-	"""
-	if len(curr_ll_node.branch) == 0:
-		# case 1: non-branch node -> branch node
-		curr_node = tmp_nf_node()
-		curr_node.setup(curr_ll_node)
-		for curr_branch in next_ll_node.branch:
-			curr_branch_root_node = convert_nf_graph(curr_branch)
-			curr_node.adj_nodes.append(curr_branch_root_node)
-		return curr_node
-	else:
-		# case 2: branch node -> non-branch node
-		next_node = tmp_nf_node()
-		next_node.setup(next_ll_node)
-		for curr_branch in curr_ll_node.branch:
-			curr_branch_root_node = None
-	"""
-
-	"""
-	while curr_ll_node != None:
-		new_node_list = curr_ll_node.get_nf_node()
-		if len(new_node_list) == 1:
-			# normal node
-			new_node = new_node_list[0][0]
-			#print(new_node.name, len(prev_node_list))
-			if root_node == None:
-				root_node = new_node
-			else:
-				for p_node in prev_node_list:
-					p_node.adj_nodes.append(new_node)
-			# set up prev_node_list
-			prev_node_list = [new_node]
-		else:
-			# branch node
-			tmp_prev_node_list = []
-			for branch_node_list in new_node_list:
-				# process one branch
-				for new_node in branch_node_list:
-
-			continue
-
-		curr_ll_node = curr_ll_node.next
-	"""
-
 
 class linkedlist_node(object):
 	def __init__(self):
 		# instance = str, var, nlist
+		# instance_nf_type = nf's type name
 		# transition_condition = ntuple
 		# branch = list of network service paths (root nodes of each path)
 		# length = the length for the current node
 		# prev = prev node
 		# next = next node
 		self.instance = None
+		self.instance_nf_type = None
 		self.spi = 0
 		self.si = 0
 		self.transition_condition = None
@@ -261,6 +117,8 @@ class linkedlist_node(object):
 		self.next = None
 
 	def set_node_instance(self, node_instance, scanner):
+		# self.postprocess(scanner) will post-process every 'branch' node.
+		# It shall set up the 'self.branch' to show the node's all branches.
 		self.instance = copy.deepcopy(node_instance)
 		self.postprocess_branches(scanner)
 
@@ -280,10 +138,10 @@ class linkedlist_node(object):
 		return len_count
 
 	def postprocess_branches(self, scanner):
-		# scanner.struct_nlinkedlist_dict:
-		# It stores all NF chains. All chains are indexed by its instance's name.
-		if isinstance(self.instance, list):
-			# branch node 
+		# We have to use 'scanner.struct_nlinkedlist_dict'. 
+		# This dictionary stores all NF chain instances.
+		# Each NF chain is indexed by the instance's name.
+		if isinstance(self.instance, list): # branch node
 			# (Note: self.branch has not been setup yet, i.e. len(self.branch)==0)
 			curr_branch_length, max_branch_length = 0, 0
 			for subchain in self.instance:
@@ -307,14 +165,12 @@ class linkedlist_node(object):
 					self.branch.append( subchain['nfchain'] )
 					curr_branch_length = subchain['nfchain'].get_length()
 				max_branch_length = max(max_branch_length, curr_branch_length)
-		else:
-			# normal NF node
+		else: # normal NF node
 			self.length = 1
 		return
 
 	def get_nf_node(self):
 		"""
-		get_nf_graph(self):
 		This function will return a list. It can convert the linkedlist, starting
 		from the self node. 
 		Note: the graph struct comes from the 'branch' nodes. Otherwise, the result 
@@ -323,8 +179,7 @@ class linkedlist_node(object):
 		res_node_list = []
 		if len(self.branch) == 0:
 			# process a non-branch node
-			new_node = tmp_nf_node()
-			new_node.setup(self)
+			new_node = nf_node(self)
 			res_node_list.append([new_node])
 		else:
 			# process a branch node
@@ -334,8 +189,7 @@ class linkedlist_node(object):
 				while curr_node != None:
 					if len(curr_node.branch) == 0:
 						# process a non-branch node
-						new_node = tmp_nf_node()
-						new_node.setup(curr_node)
+						new_node = nf_node(curr_node)
 						tmp_list.append(new_node)
 					else:
 						# process a branch node
@@ -370,7 +224,7 @@ class linkedlist_node(object):
 
 	def get_all_nodes_branch(self):
 		"""
-		Helper function:
+		Helper function: (get_all_nodes)
 		"""
 		res_nodes = []
 		for bb in self.branch:
@@ -393,7 +247,6 @@ class linkedlist_node(object):
 		2. handle the branch struct
 		"""
 		# generate the NF placement graph (in the output format)
-
 		if graph_args is None:
 			graph_args = []
 
@@ -405,12 +258,12 @@ class linkedlist_node(object):
 
 		for m in modules:
 			# all NF modules in the NF chain graph
-			print('NF: %s, spi: %d, si: %d' %(m.name, m.spi, m.si))
+			print('NF: %s, spi: %d, si: %d' %(m.name, m.service_path_id, m.service_id))
 			name = m.name
 			mclass = m.nf_class
 			names.append(name)
-			node_labels[name] = '%s\\n%s' %(name, mclass)
-			node_labels[name] += 'spi:%d si:%d' %(m.spi, m.si)
+			node_labels[name] = '%s\\n%s\\n' %(name, mclass)
+			node_labels[name] += 'spi:%d si:%d' %(m.service_path_id, m.service_id)
 
 		try:
 			f = subprocess.Popen('graph-easy ' + ' '.join(graph_args), shell=True,\
@@ -419,7 +272,6 @@ class linkedlist_node(object):
 			for name in names:
 				for next_node in nf_graph.module_list[name].adj_nodes:
 					next_nf_name = next_node.name
-					print('[%s] -> [%s]' %(name, next_nf_name))
 					print('[%s] -> [%s]' %(node_labels[name], node_labels[next_nf_name]), file=f.stdin )
 			output, error = f.communicate()
 			f.wait()
@@ -515,19 +367,17 @@ class UDNFCPUserListener(NFCPUserListener):
 		# i.e. flowspec : NF chain
 		self.flowspec_nfchain_mapping = {}
 
-		self.overall_nf_chain_list = []
 		self.service_path_count = 0
 		self.line_count = 0
 		return
 
 	# Enter a parse tree produced by NFCPUserParser#total.
 	def enterTotal(self, ctx):
-		print("NFCP AST Walker starts:")
+		#print("NFCP AST Walker starts:")
 		pass
 
 	# Exit a parse tree produced by NFCPUserParser#total.
 	def exitTotal(self, ctx):
-		print("NFCP AST Walker ends!")
 		pass
 
 
@@ -582,7 +432,6 @@ class UDNFCPUserListener(NFCPUserListener):
 	# Exit a parse tree produced by NFCPUserParser#define_string.
 	def exitDefine_string(self, ctx):
 		pass
-
 
 	def get_bool_from_ctx(self, ctx):
 		res = None
@@ -734,7 +583,7 @@ class UDNFCPUserListener(NFCPUserListener):
 
 	def get_nlinkedlist_from_ctx(self, nlinkedlist_obj):
 		"""
-		This function will return the root node for the defined linkedlist instance.
+		This function will return the root node for the defined linkedlist.
 		At this point, we don't have to further process the linkedlist.
 		"""
 		# root node
@@ -803,6 +652,7 @@ class UDNFCPUserListener(NFCPUserListener):
 		spi_val += 1
 		si_val = 0
 
+		self.service_path_count += 1
 		print(ctx.VARIABLENAME(0), ctx.VARIABLENAME(1))
 		flowspec = str(ctx.VARIABLENAME(0))
 		nfchain = str(ctx.VARIABLENAME(1))

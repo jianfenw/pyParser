@@ -1,11 +1,15 @@
 """
-* 
+* Title: lang_parser_helper.py
+* Description:
+* This library contains useful functions for parsing. It is based on regular 
+* expression to scan, match, and parse key words in a piece of text.
+*
 * Author: Jianfeng Wang
-* Time: 04-06-2017
+* Time: 04/06/2018
 * Email: jianfenw@usc.edu
 *
 * Author: Jane Yen
-* Time: 04-06-2018
+* Time: 04/06/2018
 * Email: yeny@usc.edu
 *
 """
@@ -30,10 +34,6 @@ def convert_str_to_list(gen_line):
 			res.append(parse_result_single.group(1))
 	return res
 
-def convert_str_to_str(gen_line):
-	"""
-	This function will convert a 
-	"""
 
 # User-level Lang Parser Helper
 
@@ -54,7 +54,8 @@ built_in_traffic_type_lookup_table = {
 def is_empty_line(user_line):
 	return (len(user_line.strip()) == 0)
 
-def user_parser_traffic_type(user_line):
+
+def user_parser_traffic_type_old(user_line):
 	"""
 	Input: 'xxx_Traffic(arguments)'
 	Ouput: res [= ('xxx_Traffic': arguments)] / otherwise return None
@@ -72,11 +73,25 @@ def user_parser_traffic_type(user_line):
 		return ('ALL_Traffic', [] )
 	return res
 
+
+def user_parser_traffic_type(user_line):
+	"""
+	Input: '{(a,b,c), (d,e,f)}'
+	Ouput: ['(a,b,c)', '(d,e,f)']
+	"""
+	parse_result = re.match(r"\{(.*)\}", user_line, re.M|re.I)
+	if parse_result == None:
+		return None
+	else:
+		return parse_result.groups(1)
+
 def user_parser_nickname(user_line):
 	"""
-	This function is used to parse 'Nickname::Standard_name'
+	This function is used to parse 'instance_name = type_name'
+	Input: str
+	Output: key, value (e.g. instance_name, type_name)
 	"""
-	parse_result = re.match(r"(.*)::(.*)", user_line, re.M|re.I)
+	parse_result = re.match(r"(.*)=(.*)", user_line, re.M|re.I)
 	return parse_result.group(1).strip(), parse_result.group(2).strip()
 
 
