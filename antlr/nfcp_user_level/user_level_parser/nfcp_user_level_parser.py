@@ -119,7 +119,7 @@ class nfcp_config_parser(object):
 		
 		pass
 
-	def conf_parser_get_all_graphs(self):
+	def conf_parser_get_all_graph(self):
 
 		return
 
@@ -180,6 +180,7 @@ def nf_chain_parser_example_tester(input_parser, argv=None):
 
 	print "# 12 Statistics:"
 	print 'Total # of service paths:', scanner.service_path_count
+	print 'Total # of NF moduels', nf_chain_get_all_nodes(scanner)
 	#print scanner.overall_nf_chain_list
 	print("NFCP User-Level Parser Finished!")
 

@@ -120,6 +120,8 @@ class nf_node(object):
 		self.nf_type = None
 		self.service_path_id = -1
 		self.service_id = -1
+		self.transition_condition = None
+		self.argument = None
 		if ll_node != None:
 			self.setup_node_from_ll_node(ll_node)
 		# connection_status:
@@ -144,7 +146,6 @@ class nf_node(object):
 		self.ingress_apply_rules = None
 		self.egress_code = None
 		self.deparser_header_list = None
-		self.argument_list = None
 		return
 
 	def setup_node_from_argument(self, nf_name, spi, si):
@@ -155,8 +156,11 @@ class nf_node(object):
 
 	def setup_node_from_ll_node(self, ll_node):
 		self.name = ll_node.instance
+		self.nf_class = ll_node.instance_nf_class
 		self.service_path_id = ll_node.spi
 		self.service_id = ll_node.si
+		self.transition_condition = copy.deepcopy(ll_node.transition_condition)
+		self.argument = copy.deepcopy(ll_node.argument)
 		return
 
 	def setup_node_module_type(self):

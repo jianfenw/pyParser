@@ -22,10 +22,11 @@ from NFCPUserListener import NFCPUserListener
 from util.nfcp_nf_node import nf_chain_graph, nf_node
 
 global spi_val, si_val
+global anon_count
 
 spi_val = 0
 si_val = 0
-
+anon_count = 0
 
 def convert_nf_graph(ll_node):
 	"""
@@ -100,17 +101,18 @@ def convert_nf_graph(ll_node):
 class linkedlist_node(object):
 	def __init__(self):
 		# instance = str, var, nlist
-		# instance_nf_type = nf's type name
+		# instance_nf_class = nf's type name
 		# transition_condition = ntuple
 		# branch = list of network service paths (root nodes of each path)
 		# length = the length for the current node
 		# prev = prev node
 		# next = next node
 		self.instance = None
-		self.instance_nf_type = None
+		self.instance_nf_class = None
 		self.spi = 0
 		self.si = 0
 		self.transition_condition = None
+		self.argument = None
 		self.branch = []
 		self.length = 0
 		self.prev = None
@@ -119,8 +121,25 @@ class linkedlist_node(object):
 	def set_node_instance(self, node_instance, scanner):
 		# self.postprocess(scanner) will post-process every 'branch' node.
 		# It shall set up the 'self.branch' to show the node's all branches.
-		self.instance = copy.deepcopy(node_instance)
+		global anon_count
+		if isinstance(node_instance, list):
+			self.instance = copy.deepcopy(node_instance)
+		elif isinstance(node_instance, tuple):
+			anon_count += 1
+			self.instance = "anon %d" %(anon_count)
+			self.instance_nf_class = copy.deepcopy(node_instance[0])
+			self.argument = copy.deepcopy(node_instance[1])
+		else: # type(node_instance)=str
+			if node_instance in scanner.func_dict: # nf object
+				self.instance = copy.deepcopy(node_instance)
+				self.instance_nf_class = copy.deepcopy(scanner.func_dict[node_instance][0])
+				self.argument = copy.deepcopy(scanner.func_dict[node_instance][1])
+			else: # nf
+				anon_count += 1
+				self.instance = "anon %d" %(anon_count)
+				self.instance_nf_class = node_instance
 		self.postprocess_branches(scanner)
+		return
 
 	def set_transition_condition(self, ntuple_instance):
 		self.transition_condition = ntuple_instance
@@ -258,11 +277,11 @@ class linkedlist_node(object):
 
 		for m in modules:
 			# all NF modules in the NF chain graph
-			print('NF: %s, spi: %d, si: %d' %(m.name, m.service_path_id, m.service_id))
+			print('NF: %s, spi: %d, si: %d' %(m.nf_class, m.service_path_id, m.service_id))
 			name = m.name
 			mclass = m.nf_class
 			names.append(name)
-			node_labels[name] = '%s\\n%s\\n' %(name, mclass)
+			node_labels[name] = '%s\\n%s\\n' %(mclass, name)
 			node_labels[name] += 'spi:%d si:%d' %(m.service_path_id, m.service_id)
 
 		try:
@@ -294,10 +313,10 @@ class linkedlist_node(object):
 		if len(self.branch) != 0:
 			res_str += 'NF Branch[spi=%d]' %(self.spi)
 		else:
-			res_str += "%s[spi=%d si=%d]" %(self.instance, self.spi, self.si)
+			res_str += "%s[name=%s spi=%d si=%d]" %(self.instance_nf_class, self.instance, self.spi, self.si)
 		
 		if self.next != None:
-			res_str += " -> " + self.next.__str__()
+			res_str += " -> " + str(self.next)
 		return res_str
 
 	# The next three functions are used to assign SPI and SI values for
@@ -405,7 +424,7 @@ class UDNFCPUserListener(NFCPUserListener):
 
 	# Enter a parse tree produced by NFCPUserParser#define_float.
 	def enterDefine_float(self, ctx):
-		#print(ctx.VARIABLENAME(), ctx.FLOAT(), type(str(ctx.FLOAT())))
+		#print(ctx.VARIABLENAME(), ctx.FLOAT(), type(str(ctx.FLfOAT())))
 		var_name = str(ctx.VARIABLENAME())
 		var_value = float(str(ctx.FLOAT()))
 		self.var_float_dict[var_name] = var_value
@@ -455,7 +474,16 @@ class UDNFCPUserListener(NFCPUserListener):
 
 	def get_nf_from_ctx(self, ctx):
 		# return the NF's name from the netfunction context
-		res = str(ctx.VARIABLENAME())
+		nf_name = str(ctx.VARIABLENAME(0))
+		nf_arg = None
+		if ctx.nlist() != None:
+			nf_arg = self.get_nlist_from_ctx(ctx.nlist())
+		elif ctx.ntuple() != None:
+			nf_arg = self.get_nlist_from_ctx(ctx.ntuple())
+		elif len(ctx.VARIABLENAME()) == 2:
+			nf_arg = str(ctx.VARIABLENAME(1))
+
+		res = (nf_name, nf_arg)
 		return res
 
 	# Enter a parse tree produced by NFCPUserParser#define_nfinstance.
@@ -571,12 +599,11 @@ class UDNFCPUserListener(NFCPUserListener):
 		res_value = None
 		if nll_elem_obj.netfunction() != None:
 			#print('nll elem - netfunc:', str(nll_elem_obj.netfunction().VARIABLENAME()))
-			res_value = str(nll_elem_obj.netfunction().VARIABLENAME())
+			res_value = self.get_nf_from_ctx(nll_elem_obj.netfunction())
 		elif nll_elem_obj.VARIABLENAME() != None:
 			#print('nll elem - var:', str(nll_elem_obj.VARIABLENAME()))
 			res_value = str(nll_elem_obj.VARIABLENAME())
-		elif nll_elem_obj.nlist() != None:
-			# a 'branch' node
+		elif nll_elem_obj.nlist() != None: # a 'branch' node
 			#print('nll elem - nlist:', self.get_nlist_from_ctx(nll_elem_obj.nlist()))
 			res_value = self.get_nlist_from_ctx(nll_elem_obj.nlist())
 		return res_value
@@ -585,22 +612,23 @@ class UDNFCPUserListener(NFCPUserListener):
 		"""
 		This function will return the root node for the defined linkedlist.
 		At this point, we don't have to further process the linkedlist.
+		Input: ll_node_ctx
+		Output: root_node (type=ll_node)
 		"""
-		# root node
 		root_ll_node = None
 		curr_ll_node = root_ll_node
 		nll_obj_list = nlinkedlist_obj.nlinkedlist_elem()
 		for nll_elem_obj in nll_obj_list:
-			# for each ll_elem, we create a nlinkedlist_node instance to store it.
+			# for each ll_elem, we create a ll_node instance
+			# ll_node.instance : nlist / Var / NF() (before postprocessing)
 			new_ll_node = linkedlist_node()
-			# node_instance: nlist / Var / NF()
 			node_instance = self.get_nlinkedlistelem_from_ctx(nll_elem_obj)
+			#print(node_instance)
 			new_ll_node.set_node_instance(node_instance, self)
-			
-			if root_ll_node == None: # the first node
+			if root_ll_node == None: # set up the root node
 				new_ll_node.prev = None
 				root_ll_node = new_ll_node
-			else: # not the first node (set up the curr_ll_node's next node)
+			else: # set up the curr_ll_node's next node
 				new_ll_node.prev = curr_ll_node
 				curr_ll_node.next = new_ll_node
 			curr_ll_node = new_ll_node
@@ -617,9 +645,9 @@ class UDNFCPUserListener(NFCPUserListener):
 		var_name = str(ctx.VARIABLENAME())
 		nlinkedlist_obj = ctx.nlinkedlist()
 		nlinkedlist = self.get_nlinkedlist_from_ctx(nlinkedlist_obj)
-		print("Store nlinkedlist. Name: %s, Len: %d" %(var_name, nlinkedlist.get_length()))
+		#print("Store nlinkedlist[name=\"%s\", len=%d]" %(var_name, len(nlinkedlist)))
 		self.struct_nlinkedlist_dict[var_name] = nlinkedlist
-		pass
+		return
 
 	# Exit a parse tree produced by NFCPUserParser#define_nlinkedlist.
 	def exitDefine_nlinkedlist(self, ctx):
@@ -636,7 +664,14 @@ class UDNFCPUserListener(NFCPUserListener):
 
 	# Enter a parse tree produced by NFCPUserParser#define_nfchain.
 	def enterDefine_nfchain(self, ctx):
-		pass
+		var_name = str(ctx.VARIABLENAME())
+		print("Enter Define nfchain %s" %(var_name))
+		netfunc_chain_obj = ctx.netfunction_chain()
+		nlinkedlist_obj = netfunc_chain_obj.nlinkedlist()
+		nlinkedlist = self.get_nlinkedlist_from_ctx(nlinkedlist_obj)
+		print("Store nlinkedlist[name=\"%s\", len=%d]" %(var_name, len(nlinkedlist)))
+		self.struct_nlinkedlist_dict[var_name] = nlinkedlist
+		return
 
 	# Exit a parse tree produced by NFCPUserParser#define_nfchain.
 	def exitDefine_nfchain(self, ctx):
@@ -653,13 +688,13 @@ class UDNFCPUserListener(NFCPUserListener):
 		si_val = 0
 
 		self.service_path_count += 1
-		print(ctx.VARIABLENAME(0), ctx.VARIABLENAME(1))
+		#print(ctx.VARIABLENAME(0), ctx.VARIABLENAME(1))
 		flowspec = str(ctx.VARIABLENAME(0))
 		nfchain = str(ctx.VARIABLENAME(1))
 		self.struct_nlinkedlist_dict[nfchain].assign_service_index()
 		self.flowspec_nfchain_mapping[flowspec] = nfchain
-		print(self.struct_nlinkedlist_dict[nfchain])
-		pass
+		print("print chain[%s]: %s" %(nfchain, self.struct_nlinkedlist_dict[nfchain]))
+		return
 
 	# Exit a parse tree produced by NFCPUserParser#configue_nfchain.
 	def exitConfig_nfchain(self, ctx):

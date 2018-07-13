@@ -31,14 +31,13 @@ define_string : VARIABLENAME '=' STRING ;
 
 define_bool : VARIABLENAME '=' BOOL ;
 
-define_nfinstance : VARIABLENAME '=' netfunction ;
+define_nfinstance : 'func' VARIABLENAME '=' netfunction ;
 
 define_nlist : VARIABLENAME '=' nlist ;
 
 define_ntuple : VARIABLENAME '=' ntuple ;
 
-define_nlinkedlist : VARIABLENAME '=' nlinkedlist ;
-
+define_nlinkedlist: VARIABLENAME '=' nlinkedlist ;
 
 /*
  * Define Flowspec and NF Chain. Configure NF Chain
@@ -47,9 +46,9 @@ define_nlinkedlist : VARIABLENAME '=' nlinkedlist ;
  * - type(netfunction_chain) must be nlinkedlist whose elements must be netfunction
  */
 
-define_flowspec : VARIABLENAME '=' flowspec ;
+define_flowspec : 'flow' VARIABLENAME '=' flowspec ;
 
-define_nfchain : VARIABLENAME '=' netfunction_chain ;
+define_nfchain : 'chain' VARIABLENAME '=' netfunction_chain ;
 
 config_nfchain : VARIABLENAME ':' VARIABLENAME ;
 
@@ -65,7 +64,9 @@ flowspec : nlist ;
 
 netfunction_chain : nlinkedlist ;
 
-netfunction : ( VARIABLENAME '(' ')' ) ;
+netfunction : ( VARIABLENAME '(' ')' 
+	| VARIABLENAME '(' VARIABLENAME ')'
+	| VARIABLENAME '(' nlist ')' | VARIABLENAME '(' ntuple ')' ) ;
 
 /*
  * Structured Data Types
